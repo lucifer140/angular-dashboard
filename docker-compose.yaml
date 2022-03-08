@@ -1,10 +1,10 @@
 version: '3.3'
 services: 
-   angulardashboard:
+   testapp:
       build: 
         context: .
-        dockerfile: Dockerfile
-      container_name: angulardashboard
+        dockerfile: Dockerfile-multistage
+      container_name: testapp
       ports: 
         - 4500:80
     

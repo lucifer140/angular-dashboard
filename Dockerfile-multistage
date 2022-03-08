@@ -1,0 +1,15 @@
+FROM node:10 as Test
+WORKDIR /app
+COPY package*.json /app/
+RUN npm install
+ COPY ./ /app/
+ RUN npm run build --production
+
+
+FROM nginx:alpine
+
+
+COPY --from=Test /app/dist/saptabazar-dashboard /usr/share/nginx/html
+
+
+CMD ["nginx", "-g", "daemon off;"]
