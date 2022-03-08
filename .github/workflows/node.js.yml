@@ -1,4 +1,4 @@
-name: Angular Dashboard
+name: Testapp
 
 on:
   push:
@@ -6,9 +6,8 @@ on:
       - master
 
 jobs:
-  testangularapplication:
-
-    runs-on: ubuntu-latest
+  testapplication:
+    runs-on: self-hosted
 
     strategy:
       matrix:
@@ -20,31 +19,19 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install and test
+    - name: docker build and push
       run: |
-        npm install
-        npm run build 
-        ng serve
+       docker build -t 3iamlucifer12/testapp -f Dockerfile-multistage .
+       docker push 3iamlucifer12/testapp
         
   
   deploynodeapp:
-    needs: [testangularapplication]
-    runs-on: ubuntu-latest
+    needs: [testapplication]
+    runs-on: self-hosted
 
     steps:
-    - name: SSH and deploy node app
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        script: |
-          mkdir -p ~/angular/
-          cd ~/angular/
-          git clone https://github.com/sagarshrestha24/angular-dashboard.git
-          cd angular-dashboard
-          docker-compose down
-          docker-compose build
-          docker-compose up -d 
-         
+    - name: Deploy testapp
+      run: | 
+       docker-compose up -d
+       docker ps
+     
